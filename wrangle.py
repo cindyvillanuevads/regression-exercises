@@ -9,17 +9,22 @@ import warnings
 warnings.filterwarnings("ignore")
 
 # ****************************************************************************************************************************************
-#  this function was shared by a classmate
+#  this function was shared by a classmate. I add some things
 #*******************************************************************************************************************************\
 
-def missing_values_table(df):
+def miss_dup_values(df):
     '''
-    this function takes a dataframe as input and will output metrics for missing values, and the percent of that column that has missing values
+    this function takes a dataframe as input and will output metrics for missing values and duplicated rows, 
+    and the percent of that column that has missing values and duplicated rows
     '''
         # Total missing values
     mis_val = df.isnull().sum()
         # Percentage of missing values
     mis_val_percent = 100 * df.isnull().sum() / len(df)
+        #total of duplicated
+    dup = df.duplicated().sum()  
+        # Percentage of missing values
+    dup_percent = 100 * dup / len(df)
         # Make a table with the results
     mis_val_table = pd.concat([mis_val, mis_val_percent], axis=1)
         # Rename the columns
@@ -30,7 +35,9 @@ def missing_values_table(df):
         # Print some summary information
     print ("Your selected dataframe has " + str(df.shape[1]) + " columns.\n"      
            "There are " + str(mis_val_table_ren_columns.shape[0]) +
-           "columns that have missing values.")
+           " columns that have missing values.")
+    print( "  ")
+    print (f"** There are {dup} duplicate rows that represents {round(dup_percent, 2)}% of total Values**")
         # Return the dataframe with missing information
     return mis_val_table_ren_columns
 
@@ -40,7 +47,7 @@ def missing_values_table(df):
 
 
 
-# *******************************************************************************************************
+# ********************************************  TELCO   ***********************************************************
 
 
 def clean_telco(df):
@@ -91,4 +98,51 @@ def wrangle_telco():
     df = acquire.get_telco()
     telco_df = clean_telco(df)
     return telco_df
+
+
+
+# ******************************************** ZILLOW ********************************************
+
+def clean_zillow (df):
+    '''
+    Takes in a df and drops duplicates,  nulls, all houses that do not have bedrooms and bathrooms,
+    houses that calculatedfinishedsquarefeet < 800, and bedroomcnt, yearbuilt, fips are changed to
+    int.
+    Return a clean df
+    '''
     
+    # drop duplicates
+    df = df.drop_duplicates()
+    #drop nulls
+    df = df.dropna(how='any',axis=0)
+
+    #drop all houses with bath = 0 and bedromms = 0
+    #get the index to drop the rows
+    ind = list(df[(df.bedroomcnt == 0) & (df.bathroomcnt == 0)].index)
+    #drop
+    df.drop(ind, axis=0, inplace= True)
+
+
+    #drop all houses calculatedfinisheedsqf <800
+    #get the index to drop
+    lis =list(df[df['calculatedfinishedsquarefeet'] < 800].index)
+    #drop the rows
+    df.drop(lis, axis=0, inplace = True)
+
+    #bedrooms, yearbuilt and fips can be converted to int
+    df[['bedroomcnt', 'yearbuilt', 'fips']] = df[['bedroomcnt', 'yearbuilt', 'fips']].astype(int)
+    return df
+
+
+
+def wrangle_zillow():
+    ''''
+    This function will acquire zillow db using get_new_zillow function. then it will use another
+    function named  clean_zillwo that drops duplicates,  nulls, all houses that do not have bedrooms and bathrooms,
+    houses that calculatedfinishedsquarefeet < 800.
+     bedroomcnt, yearbuilt, fips are changed to int.
+    return cleaned zillow DataFrame
+    '''
+    df = acquire.get_new_zillow()
+    zillow_df = clean_zillow(df)
+    return zillow_df
