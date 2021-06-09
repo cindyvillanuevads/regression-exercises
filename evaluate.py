@@ -85,7 +85,7 @@ def defregression_errors(df, y, yhat):
 
 
 
-    def baseline_mean_errors(df, y):
+def baseline_mean_errors(df, y):
     '''
     Takes in a dataframe , y = column with actual_values 
     and calculate:
@@ -94,24 +94,24 @@ def defregression_errors(df, y, yhat):
     total sum of squares (TSS)
     mean squared error (MSE)
     root mean squared error (RMSE)
-    
+
     Example:
     plot_residuals(df, 'tip')
     '''
     #import
     from sklearn.metrics import  mean_squared_error
     from math import sqrt
-    
+
     #baseline
     df['yhat_baseline'] = df[y].mean()
-    
+
     #calculate SSE using sklearn
     SSE_baseline = mean_squared_error(df[y], df['yhat_baseline'])*len(df)
     #mean squared error (MSE)
     MSE_baseline = mean_squared_error(df[y], df.yhat_baseline)
     #root mean squared error (RMSE)
     RMSE_baseline = sqrt(MSE_baseline)
-    
+
     #print
     print ('**BASELINE**')
     print (f' Sum of squared errors (SSE)    = {round (SSE_baseline, 3)}')
