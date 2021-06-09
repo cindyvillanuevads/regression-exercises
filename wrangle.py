@@ -85,6 +85,30 @@ def split_data(df):
     print(f'test -> {test.shape}')                                  
     return train, validate, test
 
+def split_Xy (train, validate, test, target):
+    '''
+    This function takes in three dataframe (train, validate, test) and a target  and splits each of the 3 samples
+    into a dataframe with independent variables and a series with the dependent, or target variable.
+    The function returns 3 dataframes and 3 series:
+    X_train (df) & y_train (series), X_validate & y_validate, X_test & y_test.
+    Example:
+    X_train, y_train, X_validate, y_validate, X_test, y_test = split_Xy (train, validate, test, 'Fertility' )
+    '''
+    
+    #split train
+    X_train = train.drop(columns= [target])
+    y_train= train[target]
+    #split validate
+    X_validate = validate.drop(columns= [target])
+    y_validate= validate[target]
+    #split validate
+    X_test = test.drop(columns= [target])
+    y_test= test[target]
+
+    print(f'X_train -> {X_train.shape}               y_train->{y_train.shape}')
+    print(f'X_validate -> {X_validate.shape}         y_validate->{y_validate.shape} ')        
+    print(f'X_test -> {X_test.shape}                  y_test>{y_test.shape}') 
+    return  X_train, y_train, X_validate, y_validate, X_test, y_test
 
 def wrangle_telco():
     ''''
@@ -146,3 +170,70 @@ def wrangle_zillow():
     df = acquire.get_new_zillow()
     zillow_df = clean_zillow(df)
     return zillow_df
+
+
+
+
+# Function for acquiring and prepping my student_grades df.
+
+def wrangle_grades():
+    '''
+    Read student_grades csv file into a pandas DataFrame,
+    drop student_id column, replace whitespaces with NaN values,
+    drop any rows with Null values, convert all columns to int64,
+    return cleaned student grades DataFrame.
+    '''
+    # Acquire data from csv file.
+    grades = pd.read_csv('student_grades.csv')
+    
+    # Replace white space values with NaN values.
+    grades = grades.replace(r'^\s*$', np.nan, regex=True)
+    
+    # Drop all rows with NaN values.
+    df = grades.dropna()
+    
+    # Convert all columns to int64 data types.
+    df = df.astype('int')
+    
+    return df
+
+
+
+
+
+
+def wrangle_student_math(path):
+    df = pd.read_csv(path, sep=";")
+
+    # drop any nulls
+    df = df[~df.isnull()]
+
+    # get object column names
+    object_cols = get_object_cols(df)
+
+    # create dummy vars
+    df = create_dummies(df, object_cols)
+
+    # split data
+    X_train, y_train, X_validate, y_validate, X_test, y_test = train_validate_test(
+        df, "G3"
+    )
+
+    # get numeric column names
+    numeric_cols = get_numeric_X_cols(X_train, object_cols)
+
+    # scale data
+    X_train_scaled, X_validate_scaled, X_test_scaled = min_max_scale(
+        X_train, X_validate, X_test, numeric_cols
+    )
+
+    return (
+        df,
+        X_train,
+        X_train_scaled,
+        y_train,
+        X_validate_scaled,
+        y_validate,
+        X_test_scaled,
+        y_test,
+    )
