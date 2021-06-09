@@ -36,7 +36,7 @@ def plot_residuals ( df, y, yhat  ):
 
 
 
-def defregression_errors(df, y, yhat):
+def regression_errors(df, y, yhat):
     '''
     Takes in a dataframe , y = column with actual_values and yhat= name of the columns with predicted_values
     and calculate:
@@ -45,7 +45,7 @@ def defregression_errors(df, y, yhat):
     total sum of squares (TSS)
     mean squared error (MSE)
     root mean squared error (RMSE)
-    
+    Returns a dictionary with all these values.
     Example:
     plot_residuals(df, 'tip', 'yhat')
     '''
@@ -65,23 +65,17 @@ def defregression_errors(df, y, yhat):
     #root mean squared error (RMSE)
     RMSE = sqrt(MSE)
     
-    #print
-    print ('**MODEL**')
-    print (f' Sum of squared errors (SSE)    = {round (SSE, 3)}')
-    print (f' Explained sum of squares (ESS) = {round (ESS, 3)}')
-    print (f' Total sum of squares (TSS)     = {round (TSS, 3)}')
-    print (f' mean squared error (MSE)       = {round (MSE, 3)}')
-    print (f' mean squared error (RMSE)      = {round (RMSE, 3)}')
-    print (f' Variance (r2)                  = {round (ESS/TSS, 3)}')
-    print ('  ')
-    return {
+    #create a dictionary
+    m= {
         'sse': SSE,
         'ess': ESS,
+        'rmse': RMSE,
         'tss': TSS,
         'mse': MSE,
-        'rmse': RMSE,
         'r2': ESS/TSS,
     }
+
+    return m
 
 
 
@@ -94,7 +88,7 @@ def baseline_mean_errors(df, y):
     total sum of squares (TSS)
     mean squared error (MSE)
     root mean squared error (RMSE)
-
+    Returns a dictionary with all these values
     Example:
     plot_residuals(df, 'tip')
     '''
@@ -107,19 +101,53 @@ def baseline_mean_errors(df, y):
 
     #calculate SSE using sklearn
     SSE_baseline = mean_squared_error(df[y], df['yhat_baseline'])*len(df)
+    #explained sum of squares (ESS)
+    ESS_b = ((df.yhat_baseline - df[y].mean())**2).sum()
+    #total sum of squares (TSS)
+    TSS_b = ((df[y] - df[y].mean())**2).sum()
     #mean squared error (MSE)
     MSE_baseline = mean_squared_error(df[y], df.yhat_baseline)
     #root mean squared error (RMSE)
     RMSE_baseline = sqrt(MSE_baseline)
-
-    #print
-    print ('**BASELINE**')
-    print (f' Sum of squared errors (SSE)    = {round (SSE_baseline, 3)}')
-    print (f' mean squared error (MSE)       = {round (MSE_baseline, 3)}')
-    print (f' mean squared error (RMSE)      = {round (RMSE_baseline, 3)}')
-    print ('  ')
-    return {
+    
+    #create dicc
+    b ={
         'sse': SSE_baseline,
         'mse': MSE_baseline,
         'rmse': RMSE_baseline,
+         'tss': TSS_b,
+        'ess' : ESS_b,
+        'mse': MSE_baseline,
+        'r2': ESS_b/TSS_b,       
     }
+
+    return b
+
+
+
+
+def better_than_baseline(df, y, yhat):
+    '''
+    Takes in a df, column with actual values,  and predicted values
+    and returns true if your model performs better than the baseline, otherwise false
+    '''    
+    from IPython.display import display, HTML
+    #baseline 
+    b = baseline_mean_errors(df,y)
+    #Model
+    m = regression_errors (df, y, yhat)
+    
+    df1 = pd.DataFrame(m, index= ['model'])
+    df2 =pd.DataFrame(b, index= ['baseline'])
+    table =pd.concat([df2, df1]).T
+    display(HTML(table.to_html()))
+    print('   ')
+
+    if m['rmse']< b['rmse']:
+        print ('Model performs better than the baseline: ',m['rmse']< b['rmse'] )
+    else:
+        print ('Model performs better than the baseline: ',m['rmse']< b['rmse'] )
+    
+    return
+
+    
