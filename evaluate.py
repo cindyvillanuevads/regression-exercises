@@ -90,7 +90,7 @@ def baseline_mean_errors(df, y):
     root mean squared error (RMSE)
     Returns a dictionary with all these values
     Example:
-    plot_residuals(df, 'tip')
+    baseline_mean_errors(y_train, 'actual')
     '''
     #import
     from sklearn.metrics import  mean_squared_error

@@ -18,7 +18,7 @@ def plot_categorical_and_continuous_vars (df, categorical, continuous):
         for cont in continuous:
             sns.boxplot(x= cat, y=cont, data=df)
             plt.show()
-            sns.swarmplot(x=cat, y=cont, data=train)
+            sns.swarmplot(x=cat, y=cont, data=df)
             plt.show()
     print('Continuous with Continuous')        
     sns.pairplot(df[continuous], kind="reg", plot_kws={'line_kws':{'color':'red'}}, corner=True)
@@ -61,7 +61,7 @@ def plot_variable_pairs(df, target):
     '''
     
     # get the list of the columns  that are not object type
-    columns = list(train.select_dtypes(exclude= 'O').columns)
+    columns = list(df.select_dtypes(exclude= 'O').columns)
     #remove target from columns
     columns.remove(target)
     

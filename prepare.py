@@ -71,15 +71,15 @@ def plot_scaled_mimmax (columns, train_df ):
         scaler.fit(train_df[[col]])
         # use it
         name = col + '_minmax'
-        train_df[name] = scaler.transform(train_df[[col]])
+        t[name] = scaler.transform(train_df[[col]])
         plt.figure(figsize=(13, 6))
         plt.subplot(121)
-        plt.hist(train_df[col], ec='black')
+        plt.hist(t[col], ec='black')
         plt.title('Original')
         plt.xlabel(col)
         plt.ylabel("counts")
         plt.subplot(122)
-        plt.hist(train_df[name],  ec='black')
+        plt.hist(t[name],  ec='black')
         plt.title('Scaled')
         plt.xlabel(name)
         plt.ylabel("counts")
